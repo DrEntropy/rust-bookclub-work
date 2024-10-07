@@ -1,0 +1,4 @@
+# Rust Book Club
+
+Notes 
+
