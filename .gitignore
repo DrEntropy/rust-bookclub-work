@@ -1,2 +1,5 @@
 # ignore rust build artifacts
 target/
+
+# vscode
+.vscode/

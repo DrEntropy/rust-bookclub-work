@@ -3,17 +3,21 @@ use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    let n: u64;
     if args.len() != 2 {
-        println!("Usage: fib <number>");
-        return;
+        println!("Usage: fib <number>, for debugging, using 10");
+        // return;
+        n = 10;
+    } else {
+        n = match args[1].parse() {
+            Ok(v) => v,
+            Err(_) => {
+                println!("Invalid number");
+                return;
+            }
+        };
     }
-    let n: u64 = match args[1].parse() {
-        Ok(n) => n,
-        Err(_) => {
-            println!("Invalid number");
-            return;
-        }
-    };
+
     match fib(n) {
         Some(fibn) => {
             println!("Fib {n} is {fibn}");
