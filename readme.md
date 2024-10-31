@@ -66,6 +66,9 @@ Understnading ownership
 * Heap vs Stack memory.   
    * Function parameters and local variables are stored on the stack.
    * Heap memory is used for dynamically sized data, and pointers to these values are stored on the stack and *own* the memory.
+   * Pointers are of two kinds: 
+     * References (which do not own the data) 
+     * Smart pointers like  Box, String, Vec (which do own the data).
 
 * Ownership rules:
   * When a non-copy trait value is assigned, passed, or returned, the ownership is transferred to the new variable. The old variable can no longer be used. 
