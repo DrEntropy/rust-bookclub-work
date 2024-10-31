@@ -58,3 +58,56 @@ All of these things will be covered in more detail in later chapters.
         println!("LIFTOFF!!!");
         ```
     
+## Chapter 4
+Understnading ownership 
+
+### What is Ownership
+
+* Heap vs Stack memory.   
+   * Function parameters and local variables are stored on the stack.
+   * Heap memory is used for dynamically sized data, and pointers to these values are stored on the stack and *own* the memory.
+
+* Ownership rules:
+  * When a non-copy trait value is assigned, passed, or returned, the ownership is transferred to the new variable. The old variable can no longer be used. 
+  * Small stack-sized types (like integers) are copied instead of moved. They implement the Copy trait and do not own any heap memory. 
+  * A value can can have only one owner at a time.
+  * When the owner goes out of scope, the value is dropped.
+ 
+
+### References and Borrowing
+
+* References allow you to refer to a value without taking ownership of it. 
+* References are created with the `&` operator.
+* Mutable references are created with `&mut` 
+
+* Rules of references:
+    * You can have either one mutable reference or any number of immutable references to a value at the same time. This ensures safe, race-free access to data.
+    * "At the same time" refers to the lifetime of the reference, not the entire scope in which it’s defined. A mutable reference's lifetime ends after its last use, making it eligible to "go out of scope" and allowing other references to take its place if needed. Note that the rust book is a bit vague on this and *seems* to conflate scope  and lifetime.
+    * References must always be valid. Rust's borrow checker enforces that a reference cannot outlive the data it refers to, preventing dangling references and ensuring memory safety.
+
+* The 'borrow checker' enforces rules at compile time to ensure that references are valid.
+
+### Slices
+
+Slices are special kinds of references because they are “fat” pointers, or pointers with metadata. 
+
+There are two types of slices covered in this chapter: string slices and array slices.
+
+* String slices are references to a portion of a string. They are created using the `&` operator. For example, `let s = String::from("hello"); let slice = &s[0..2];` creates a slice of the string `s` that contains the first two characters.   They have type `&str`.  Note string literals also have type `&str`. So functions taking refrences to strings should take `&str` to be generally useful.  (String refrences are automatically coerced to slices, which is trival since `&s[..]` is basically the same as `&s`).
+
+* Array slices are similar to string slices, but they are references to a portion of an array. They are created using the same `&` operator. For example, `let a = [1, 2, 3, 4, 5]; let slice = &a[1..3];` creates a slice of the array `a` that contains the second and third elements. In this case the type is `&[i32]`.
+
+### Alternate chapter 4
+
+[Rust Book Experimental](https://rust-book.cs.brown.edu/) provides a interactive version of the book with quizes. Most of the book seems to be the same *except* for chapter 4, which has a different structure different content. It is worth reviwing as a supplement to the main book.
+
+As this version states "A common theme will be understanding whether a function is actually safe or unsafe. Rust will always reject an unsafe program1. But sometimes, Rust will also reject a safe program. These case studies will show how to respond to errors in both situations."   Some of the quizes are quite challenging, especially those that ask you to imagine what code might not be undefined behavior if the compiler allowed it.  
+
+The section on fixing ownership issues is also quite useful and worth bookmarking: 
+[Fixing Ownership Issues](https://rust-book.cs.brown.edu/ch04-03-fixing-ownership-errors.html) 
+
+This section has many examples of ownership issues, and illustrates not only how to fix them by why they are unsafe.  
+ 
+
+## Chapter 5
+This is my chapter... see seperate charts.
