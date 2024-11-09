@@ -113,4 +113,6 @@ This section has many examples of ownership issues, and illustrates not only how
  
 
 ## Chapter 5
-This is my chapter... see seperate charts.
+
+TODO: Bring in notes from the book club slides.
+
