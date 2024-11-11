@@ -113,6 +113,186 @@ This section has many examples of ownership issues, and illustrates not only how
  
 
 ## Chapter 5
+ 
+ 
+- Structs
+- Methods
+- Other associated functions
 
-TODO: Bring in notes from the book club slides.
+### Defining Structs
 
+```rust
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u64,
+}
+```
+
+- Structs are similar to tuples, but with named parts 
+- Defines a new *type*
+
+### Instantiating Structs
+
+```rust
+fn main() {
+    let mut user1 = User {
+        email: String::from("someone@example.com"),
+        username: String::from("someusername123"),
+        active: true,
+        sign_in_count: 1,
+    };
+    user1.email = String::from("anotheremail@example.com");
+    println!("User1's email: {}",user1.email)
+}
+```
+
+- Instantiate (create) by specifying values for each key
+- To get values, use the `.` notation.  compare to R : `user1$email`
+- To change values, the entire instance must be mutable.
+
+### Using the Field Init Shorthand when Variables and Fields Have the Same Name
+```rust
+fn build_user(email: String, username: String) -> User {
+    User {
+        active: true,
+        username,
+        email,
+        sign_in_count: 1,
+    }
+}
+```
+ 
+### Struct update syntax
+
+```rust
+fn main() {
+    // --snip--
+
+    let user2 = User {
+        email: String::from("another@example.com"),
+        ..user1
+    };
+}
+```
+
+- Creates a new `User` from an existing instance `user1` 
+- Note that this *moves* data!
+    - We can no longer use `user1` because we moved the username into `user2`
+    - If we had also given a new username then `user1` would ok.
+
+### Tuple Structs
+
+```rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+fn main() {
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+```
+ 
+- Defines distinct types for `Color` and `Point`
+- Access elements by destructuring 
+- Alternately can use `.0` , `.1` etc. 
+
+### Unit Structs
+
+```rust
+struct AlwaysEqual;
+
+fn main() {
+    let subject = AlwaysEqual;
+}
+```
+
+- Useful for cases where you need a type with a singleton value. (Placeholders or markers)
+- More uses will be clearer when we discuss traits. 
+
+
+## Ownership of Struct Data
+
+- Examples so far used owned data (e.g. `String`)
+- Ensures fields are valid as long as the struct is valid.
+- Structs can store references, but this requires explicitly specifying *lifetimes* to ensure they remain valid (discussed in Chapter 10).
+
+
+### #[derive(Debug)] for printing
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    println!("rect1 is {rect1:?}");
+}
+```
+
+### dbg! Macro
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+fn main() {
+    let scale = 2;
+    let rect1 = Rectangle {
+        width: dbg!(30 * scale), // dbg! captures this intermediate value
+        height: 50,
+    };
+    dbg!(&rect1);
+}
+```
+
+* Takes ownership but then returns the value - print values inside an expression aids in debugging complex expressions. 
+* Prints file and line number 
+* Prints to `stderr` rather then `stdout`
+ 
+### More traits
+* [Appendix C](https://doc.rust-lang.org/stable/book/appendix-03-derivable-traits.html) has more derivable traits.
+* More on traits in Chapter 10
+
+
+### Defining Methods and Associated Functions
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle { //implementaiton block
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn square(size: u32) -> Rectangle {
+        Rectangle { width: size, height: size }
+    }
+} // end impl block
+```
+ 
+* Methods are like functions but defined within the context of a struct, enum, or trait object using an `impl` block
+* First parameter is always `self`. 
+* Associated functions are defined in the `impl` block without `self` as the first parameter. 
+* Methods are called like `rect1.area()` and associated functions are called like `Rectangle::square(3)`.
+ 
+
+*`&self`, `&mut self`, `self`
+    * `&self` is shorthand for `self : &Self`
+    *  `Self` is shorthand for the object type. (`Rectangle`)
+    * `&self` or `&mut self`, borrowing, is most common 
+    * using just `self` and taking ownership is rare.
+    
