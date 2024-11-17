@@ -212,7 +212,7 @@ fn main() {
 - More uses will be clearer when we discuss traits. 
 
 
-## Ownership of Struct Data
+### Ownership of Struct Data
 
 - Examples so far used owned data (e.g. `String`)
 - Ensures fields are valid as long as the struct is valid.
@@ -296,3 +296,108 @@ impl Rectangle { //implementaiton block
     * `&self` or `&mut self`, borrowing, is most common 
     * using just `self` and taking ownership is rare.
     
+
+## Chapter 6 Enums and Pattern Matching
+
+### Enums
+- **Definition**: Enums allow you to define a type by enumerating its possible values.
+  - Example:
+    ```rust
+    enum IpAddrKind {
+        V4,
+        V6,
+    }
+    ```
+- **Usage**: Enums can store data alongside their variants.
+  - Example:
+    ```rust
+    enum IpAddr {
+        V4(String),
+        V6(String),
+    }
+    ```
+  - Another:
+    ```rust
+    enum Message {
+        Quit,
+        Move { x: i32, y: i32 },
+        Write(String),
+        ChangeColor(i32, i32, i32),
+    }
+    ```
+
+### `Option` Enum
+- A built-in Rust enum for handling null or absence of a value safely.
+  - Example:
+    ```rust
+    enum Option<T> {
+        Some(T),
+        None,
+    }
+    ```
+
+### Pattern Matching
+- **`match` Expression**: A control flow construct for handling different enum variants.
+  - Example:
+    ```rust
+    #[derive(Debug)] // so we can inspect the state in a minute
+    enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
+    }
+
+    enum Coin {
+        Penny,
+        Nickel,
+        Dime,
+        Quarter(UsState),
+    }
+
+    fn value_in_cents(coin: Coin) -> u8 {
+        match coin {
+            Coin::Penny => 1,
+            Coin::Nickel => 5,
+            Coin::Dime => 10,
+            Coin::Quarter(state) => {
+                println!("State quarter from {state:?}!");
+                25
+            }
+        }
+    } 
+    ```
+- `match` arms must cover all possible cases.
+- The `_` placeholder matches any value without binding it.
+- A variable can also be used as a binding on any value
+
+### Conciseness with `if let`
+- Provides a simpler way to match a single pattern.
+  - Example:
+    ```rust
+    if let Some(value) = some_option {
+        println!("Value is {}", value);
+    }
+    ```
+- `if let` can be combined with `else` to handle the remaining cases.. 
+- Syntactic sugar for `match` with one arm:
+    - Example:
+        ```rust
+        match some_option {
+            Some(value) => println!("Value is {}", value),
+            None => (),
+        }
+        ```
+    - Becomes:
+        ```rust
+        if let Some(value) = some_option {
+            println!("Value is {}", value);
+        }
+        ```
+        
+
+### Key Takeaways
+- Enums are flexible and can hold different types of data.
+- Pattern matching is a powerful feature for handling complex logic.
+- Rust enforces safety by ensuring all cases are handled in `match`.
+
+Let me know if you need clarification on any part!
