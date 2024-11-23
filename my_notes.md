@@ -462,6 +462,7 @@ Let me know if you need clarification on any part!
     - Documentation comments are written with `///` and support Markdown formatting.
     - Place these comments just before the item they are documenting.
     - If you include code examples in your documentation, you can run them as tests using `cargo test`! So these documentation comments always use `assert_eq!` and other such macros.
+    - Documentation comments that start with `//!` are used to document the crate root or modules. They document the thing they are in.
     - Use `cargo doc --open` to generate and view documentation for your crate and dependencies.
     - Documentation comments are also used to generate documentation for crates published on crates.io.
 
@@ -471,4 +472,17 @@ Let me know if you need clarification on any part!
     - *ANYONE* can publish a crate, so be cautious when using crates from crates.io!   Name and typosquatting are a problem!
     - To use a crate, add it to the `Cargo.toml` file under `[dependencies]`.
 
+- **Workspaces**:
+    - A workspace is a collection of related packages that share the same `Cargo.lock` file.
+    - To create a workspace, place multiple packages in a directory and create a `Cargo.toml` file at the workspace root.
+    - For more details, see the [Cargo documentation](https://doc.rust-lang.org/cargo/reference/workspaces.html).
+
+- **Installing Binaries from Crates.io**:
+    - Cargo can install binaries from crates.io using `cargo install`.
+    - The binary is installed in the `~/.cargo/bin` directory by default.
  
+ - **Extending Cargo with Custom Commands**:
+    - If a binary on your path is namesd `cargo-something`, you can run it as `cargo something`.  
+    - This allows you to extend Cargo for custom tools. 
+    - With this, cargo can be extended with custom commands using the `cargo install` command.
+   
