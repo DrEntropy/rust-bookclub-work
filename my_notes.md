@@ -441,4 +441,34 @@ Let me know if you need clarification on any part!
   - Modules can be moved to separate files to keep code organized.
   - The file structure should mirror the module hierarchy.
 
+ ## Chapter 14 
+
+ Our book club did this chapter out of order because it was short are related to chapter 7.
+
+ Chapter 14 covers: 
+ - Release profiles
+ - Crates.io  
+ - Workspaces
+ - Installing binaries from crates.io
+ - Extending Cargo using custom commands
+
+ - **Release Profiles**:
+   - Cargo provides two default profiles: `dev` and `release`.
+   - The `dev` profile is optimized for development, with debug symbols and fast compilation.
+   - The `release` profile is optimized for release builds, with optimizations and no debug symbols.  (`cargo build --release`)
+   - Profiles can be customized in the `Cargo.toml` file.  See [Cargo documentation](https://doc.rust-lang.org/cargo/reference/profiles.html) for more details.
+
+ - **Documentation Comments**:
+    - Documentation comments are written with `///` and support Markdown formatting.
+    - Place these comments just before the item they are documenting.
+    - If you include code examples in your documentation, you can run them as tests using `cargo test`! So these documentation comments always use `assert_eq!` and other such macros.
+    - Use `cargo doc --open` to generate and view documentation for your crate and dependencies.
+    - Documentation comments are also used to generate documentation for crates published on crates.io.
+
+ - **Crates.io**:
+    - Crates.io is the official Rust package registry.
+    - To publish a crate, use `cargo publish` after creating an account on crates.io. 
+    - *ANYONE* can publish a crate, so be cautious when using crates from crates.io!   Name and typosquatting are a problem!
+    - To use a crate, add it to the `Cargo.toml` file under `[dependencies]`.
+
  
