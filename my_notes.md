@@ -441,7 +441,10 @@ Let me know if you need clarification on any part!
   - Modules can be moved to separate files to keep code organized.
   - The file structure should mirror the module hierarchy.
 
- ## Chapter 14 
+
+I created a simple example of module from chapter 7 (and adding doc strings from chapter 14) in `restaurant` folder.
+
+## Chapter 14 
 
  Our book club did this chapter out of order because it was short are related to chapter 7.
 
