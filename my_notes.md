@@ -489,3 +489,49 @@ I created a simple example of module from chapter 7 (and adding doc strings from
     - This allows you to extend Cargo for custom tools. 
     - With this, cargo can be extended with custom commands using the `cargo install` command.
    
+
+## Chapter 8
+
+This chapter covered the standard collections in Rust:
+
+- **Vectors**:
+  - A vector is a dynamic array that can grow or shrink in size.
+  - Created with the `vec!` macro or the `Vec::new()` function.
+  - Elements are accessed using indexing (panic on failure) or the `get` method.
+  - Iteration can be done with a `for` loop or the `iter` method.
+  - Elements can be added with the `push` method or the `insert` method.
+  - WHen a vector goes out of scope, its elements are dropped too.
+
+- **Strings**:
+    - Strings are utf-8 encoded. 
+    - "string" means either `String` (heap allocated) or string slice `&str` (reference to part of a string)
+    - The `String::from` function converts a string literal to a `String`.
+    - The `to_string` method can also be used to convert a string slice to a `String`.
+    - Strings can be concatenated with the `+` operator or the `format!` macro.  
+    - Strings cannot be indexed but can be sliced. THis is usually also not what is wanted. 
+    - Instead, use bytes() or chars() to iterate over the string. `chars` are 32 bit unicode code points. `bytes` are 8 bit UTF-8 codes.
+
+- **Hash Maps**:
+    - A hash map is a collection of key-value pairs. You have to use `use std::collections::Hashmap`.
+    - Created with the `HashMap` type and `new` method.
+    - Elements are added with the `insert` method. This will overwrite the value if the key already exists.
+    - Values are accessed with the `get` method, which returns an `Option`.
+    - The `entry` method allows for conditional insertion. 
+        - It returns an `Entry` type.
+        - `or_insert` method on `Entry` inserts a value if the key does not exist, and also returns a mutable reference to the value.
+    - Elements can be removed with the `remove` method.
+    - Iteration over keys and values can be done with for loops.
+
+
+## Chapter 9
+
+This chapter covered error handling in Rust. There are no exceptions, instead Rust uses the `Result` enum. It has two variants: `Ok` and `Err`.
+
+Several helper functions were discussed:
+
+    - `unwrap` returns the value in `Ok` or panics. Best for debugging and prototyping.
+    - `expect` is like `unwrap` but allows you to specify the panic message.
+    - `match` is the most common way to handle `Result`. It allows you to handle both `Ok` and `Err` cases explicitly.
+    - ? operator is a shortcut for propagating errors. It can only be used in functions that return `Result` or `Option`.
+
+There was also a discussion of when to `panic!` and when to return a `Result`. The general rule is to return a `Result` when the error is expected and can be handled by the caller. Use `panic!` when the error is unexpected and cannot be handled or leaves the program in an inconsistent state.
