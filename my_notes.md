@@ -535,3 +535,278 @@ Several helper functions were discussed:
     - ? operator is a shortcut for propagating errors. It can only be used in functions that return `Result` or `Option`.
 
 There was also a discussion of when to `panic!` and when to return a `Result`. The general rule is to return a `Result` when the error is expected and can be handled by the caller. Use `panic!` when the error is unexpected and cannot be handled or leaves the program in an inconsistent state.
+
+
+## Chapter 10: Generics, Traits, and Lifetimes
+
+This chapter covered generics, traits, and lifetimes in Rust.
+
+### **Generics**:
+
+- In the same way that function can take parameters instead of discrete values, generics allow functions to take types as parameters.
+- This allows for code reuse across different types. 
+- The type parameter is defined in angle brackets after the function name, and can be then used as a type in the function definition.
+- Type parameters can also be used for structs, enums, and methods.
+
+
+Example struct:
+```rust
+struct Point<T> {
+    x: T,
+    y: T,
+}
+```
+
+Note that all this says about point is that whatever T is, both x and y are of type T.  We could define a more general point struct like this:
+```rust
+struct Point<T, U> {
+    x: T,
+    y: U,
+}
+```
+
+Of course the canonical example of an enum is option:
+```rust
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+For methods, the type parameter is defined after the `impl` keyword. 
+```rust
+impl<T> Point<T> {
+    fn x(&self) -> &T {
+        &self.x
+    }
+}
+```
+
+What this says is that we are implementing for a type T, a method for a Point<T>.  We need the impl<T> so that the compiler knows that T is a type parameter and not a concrete type T.  For example this is perfectly legal:
+
+
+```rust
+impl Point<f32> {
+    fn distance_from_origin(&self) -> f32 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+```
+ 
+Note also that the method itself could take additional type parameters. 
+
+- Rust uses `mono-morphization` to generate code for each type that is used. This means that the code is as efficient as if it were written for each type.
+
+### **Traits**
+
+
+ - Motivating traits:
+
+Example Function:
+```rust
+fn largest<T>(list: &[T]) -> T {
+    let mut largest = list[0];
+    for &item in list.iter() {
+        if item > largest {
+            largest = item;
+        }
+    }
+    largest
+}
+```
+
+This example doesn't work because the `>` operator is not defined for all types. Note that in language like C++, this would be a run time error. (Well didnt c++ fix this though? Concepts?). In rust a type T has *no* capabilities.   We can fix this by adding a trait bound to the type parameter. 
+
+
+- Traits define shared behavior across types.
+- Then can be used to constrain the types that a generic function can take. 
+- Traits are similar to interfaces in other languages. 
+
+Defining a trait:
+```rust 
+pub trait Summary {
+    fn summarize(&self) -> String;
+}
+```
+This says that any type implementing this trait must have a method called `summarize` that takes a reference to self and returns a string. Note that multiple functions can be defined in a trait.
+
+Implementing a trait:
+```rust
+impl Summary for NewsArticle {
+    fn summarize(&self) -> String {
+        format!("{}, by {} ({})", self.headline, self.author, self.location)
+    }
+}
+```
+
+- This is similar to implementing regular methods.  The difference is the inclusion of the trait name and `for`.
+
+- Traits can have default implementations. This is done by adding code to the trait definition instead of the semicolon. Types can override the default implementation if they want.  But if they want to use the default implementation they can do it with an empty impl block:
+
+```rust
+pub trait Summary {
+    fn summarize(&self) -> String {
+        String::from("(Read more...)")
+    }
+}
+impl Summary for NewsArticle {}
+```
+
+- Default implementations can call other methods in the same trait (even if they dont have default implementations). In this way, a trait can provide a lot of useful functionality and only require implementors to specify a small part of it.
+
+- Note that it is not possible to call a default implementation from a method that overrides it. 
+
+- **Traits as Parameters**:
+    - Traits can be used as parameters in functions. This allows for more flexibility in the types that can be passed to a function. 
+    - This is similar to using generics, but allows for more flexibility.
+
+```rust
+pub fn notify(item: &impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+This is syntactic sugar for a generic function with *trait bounds*.  The above is equivalent to:
+
+```rust 
+pub fn notify<T: Summary>(item: &T) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
+
+- The full syntax allows for more complex trait bounds. For example, if we wanted to take two parameters that implement `Summary` we have:
+
+```rust
+pub fn notify(item1: &impl Summary, item2: &impl Summary) {
+    println!("Breaking news! {}", item1.summarize());
+    println!("Breaking news! {}", item2.summarize());
+}
+```
+
+But if we wanted to constrain the two parameters to have the same type we would have to use the full syntax:
+
+```rust
+pub fn notify<T: Summary,>(item1: &T, item2: &T) {
+    println!("Breaking news! {}", item1.summarize());
+    println!("Breaking news! {}", item2.summarize());
+}
+```
+
+- To specify more then one trait bound, use the `+` operator. 
+
+- `where` clauses can be used to make the function signature more readable when there are many trait bounds. The trait bounds are moved to the `where` clause. 
+
+
+So this:
+```rust
+fn some_function<T: Display + Clone, U: Clone + Debug>(t: &T, u: &U) -> i32 {
+```
+
+becomes this:
+```rust
+fn some_function<T, U>(t: &T, u: &U) -> i32
+    where T: Display + Clone,
+          U: Clone + Debug
+{
+```
+
+- Return types: 
+   - You can use the `impl Trait` for a return type if you are returning a single type. 
+   - This is useful when you want to return a type that implements a trait but you dont want to specify the exact type (for example Iterator types can be quite complicated?)
+   - We will see in chapter 17 how to use trait objects to return multiple types.
+
+- Using trait bounds to conditionally implement methods:
+    - You can use trait bounds to conditionally implement methods. This is useful when you want to implement a method only for types that have a certain trait. 
+    - This is done by using a `where` clause on the method implementation. 
+
+- Conditionally implementing a trait for any type that implements another type is called a `blanket implementation`.
+
+```rust
+impl<T: Display> ToString for T {
+    // --snip--
+}
+```
+
+
+
+### Lifetime annotations
+
+This is somehow the most confusing part of Rust.  Lifetimes are a way to ensure that references are valid for as long as they are used.
+
+- Much like types, most of the time the compiler can infer lifetimes.
+- We must use lifetime annotation when lifetimes of references could be related in different ways.
+- Lifetime annotations are similar to... *NOTHING* in other languages of which I am aware. 
+- Recall that lifetimes are a way to ensure that references are valid for as long as they are used. This prevents dangling references.
+
+
+Example of where lifetime annotations are needed:
+```rust
+fn longest(x: &str, y: &str) -> &str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+This will not compile because the return value could be either `x` or `y` and the compiler cannot determine which.  We can fix this by adding a lifetime annotation:
+
+```rust
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+```
+
+This says the return value will have the live as long as both `x` and `y`.  The lifetime annotation is placed after the function name and before the parameter list.  The lifetime name can be anything, but `'a` is common.  Then the lifetime annotations are placed after the `&` in the parameter list.
+
+*This annotation shows how lifetimes are related, it doesnt CHANGE lifetimes.*  It says: This function, for some lifetime `'a`, takes two references with lifetime of at least `'a` and returns a reference with lifetime `'a`.  In practice this means that the return value will have the lifetime of the shorter of `x` and `y`.  This tells the rust borrow checker what it needs to know to *check* the lifetimes during compilation.
+
+
+- There also exist lifetime bounds... not discussed in book but I saw it in an error message. For example, this is valid:
+    
+    ```rust
+    fn longest<'a, 'b: 'a>(x: &'a str, y: &'b str) -> &'a str {
+        if x.len() > y.len() {
+            x
+        } else {
+            y
+        }
+    }
+    ```
+
+- Lifetime annotations in struct defs
+
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+
+fn main() {
+    let novel = String::from("Call me Ishmael. Some years ago...");
+    let first_sentence = novel.split('.').next().unwrap();
+    let i = ImportantExcerpt {
+        part: first_sentence,
+    };
+}
+
+```
+
+Annotations here tell the compiler that the struct cannot outlive the reference.  This is required for structs that contain references.
+
+- Lifetime Elision
+  - Rust has a growing list of rules for when lifetimes can be elided. 
+  - Current rules for functions:
+        - Each parameter that is a reference gets its own lifetime parameter.
+        - If there is exactly one input lifetime parameter, that lifetime is assigned to all output lifetime parameters.
+        - If there are multiple input lifetime parameters, but one of them is `&self` or `&mut self`, the lifetime of `self` is assigned to all output lifetime parameters.
+  - If the compiler gets to the and of these rules and there are still lifetime parameters that have not been assigned, the compiler will error.
+  - The third rule  means that methods don't need lifetime annotations in most cases.
+
+- ``static` is a special lifetime that denotes that the reference *can* live for the entire duration of the program.  All string literals have the `static` lifetime.
+
+- When using generics with lifetimes, the lifetime parameter must be declared before the type parameter. <`a, T>.   
