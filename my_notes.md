@@ -831,3 +831,4 @@ Annotations here tell the compiler that the struct cannot outlive the reference.
 
 - To facilitate testing, keep the 'main' code small and put most of the code in library crates that can be tested.
 
+- I added some tests to the guessing game in the `guessing_game` folder for fun.
