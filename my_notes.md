@@ -810,3 +810,24 @@ Annotations here tell the compiler that the struct cannot outlive the reference.
 - ``static` is a special lifetime that denotes that the reference *can* live for the entire duration of the program.  All string literals have the `static` lifetime.
 
 - When using generics with lifetimes, the lifetime parameter must be declared before the type parameter. <`a, T>.   
+
+## Chapter 11: Writing Automated Tests
+
+- Rust has a built-in testing framework. 
+
+- Functions marked with `#[test]` are run when you run `cargo test`.   Specific tests can be run with `cargo test test_name`.
+
+- Tests output is normally hidden, but you can see it with `cargo test -- --show-output`.
+
+- Unit tests (focused on smaller components in isolation) are placed in the same file as the code they are testing, in a module with the `#[cfg(test)]` attribute.  The `#[cfg(test)]` attribute tells the compiler to only compile the module when running tests.
+
+- Integration tests are placed in a `tests` directory. Each file in the `tests` directory is a separate crate and uses the public API of the library.
+
+- Test functions can: 
+
+  - use `assert!` macro to test boolean expressions, as well as `assert_eq!` and `assert_ne!` for equality and inequality. A custom message can be added to the `assert!` macro.
+  - use #[should_panic] attribute to test that a function panics.
+  - use return type `Result<(), E>` . If it returns `Err(e)`, the test fails with message e, if it returns `Ok()`, the test passes.
+
+- To facilitate testing, keep the 'main' code small and put most of the code in library crates that can be tested.
+
