@@ -832,3 +832,19 @@ Annotations here tell the compiler that the struct cannot outlive the reference.
 - To facilitate testing, keep the 'main' code small and put most of the code in library crates that can be tested.
 
 - I added some tests to the guessing game in the `guessing_game` folder for fun.
+
+## Chapter 12: An I/O Project: Building a Command Line Program
+
+This chapter covers building a command line program in Rust. The program is an very simplified implementation of the Unix 'grep' command.
+
+This is a nice demonstration of the following concepts:
+
+- Keeping the main function small and putting most of the code in library crates that can be tested.
+- Using the `std::env` module to access command line arguments
+- Reading from files
+- Handling errors properly to give user helpful error messages
+- Printing to stdout and stderr as appropriate
+- Test Driven Development
+- Using other rust concepts in context.
+
+- The code is in the `minigrep` folder (final results, it might be modified further in future chapters)
