@@ -848,3 +848,10 @@ This is a nice demonstration of the following concepts:
 - Using other rust concepts in context.
 
 - The code is in the `minigrep` folder (final results, it might be modified further in future chapters)
+
+## Chapter 13: Functional Language Features: Iterators and Closures
+
+- This is my week , so i will do most notes in the bookclub repo.  
+- Some thoughts:
+        - Compare to R, where all functions are closures. 
+        - Ideas from this video: https://www.youtube.com/watch?v=C48MN4d8I5Y
