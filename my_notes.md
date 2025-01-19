@@ -851,7 +851,16 @@ This is a nice demonstration of the following concepts:
 
 ## Chapter 13: Functional Language Features: Iterators and Closures
 
-- This is my week , so i will do most notes in the bookclub repo.  
-- Some thoughts:
-        - Compare to R, where all functions are closures. 
-        - Ideas from this video: https://www.youtube.com/watch?v=C48MN4d8I5Y
+- This is my week , so most of my notes are in the bookclub notes. But here are some highlights:
+
+- Rust has excellent support for functional programming.  In addition to previously covered concepts like enums, traits and pattern matching, Rust has iterators and closures.
+
+- Closures are anonymous functions that can capture their environment. They are defined with the `|args| body` syntax.  They can be stored in variables and passed as arguments to functions.  There are some complications with closures in how they capture values.  They can capture by reference, by mutable reference, or by value.  The compiler will infer the type of the closure, but you can also specify it.
+
+- FnOnce, FnMut, and Fn are traits that define the closure's capabilities.  FnOnce consumes the variables it captures, FnMut can change the environment, and Fn can only read the environment.  The compiler will infer the trait, but you can also specify it.
+
+- Iterators in Rust are lazy sequences of values that can be transformed with adapters like map and filter and then consumed by methods such as collect or sum.
+ 
+- Zero-cost abstractions ensure that using closures and iterators (instead of manual loops or extra clones) compiles down to similarly efficient machine code while improving code expressiveness.
+
+- We also improved the minigrep project from chapter 12 using iterators and closures.  The code is in the `minigrep` folder.
