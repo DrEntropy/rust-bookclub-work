@@ -1074,4 +1074,140 @@ fn main() {
 - Using `leaf.parent.borrow().upgrade()` converts the weak reference back into an `Rc` if the parent is still valid.
 
 
- 
+ ## Chapter 16: Fearless Concurrency
+
+ ### Concurrency in Rust
+
+ - use `thread::spawn` to create a new thread with a closure. 
+ - variables must be `move`d into the closure to be used in the new thread. 
+ - `join` is used to wait for the thread to finish.
+
+```
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    thread::spawn(|| {
+        for i in 1..10 {
+            println!("hi number {i} from the spawned thread!");
+            thread::sleep(Duration::from_millis(1));
+        }
+    });
+
+    for i in 1..5 {
+        println!("hi number {i} from the main thread!");
+        thread::sleep(Duration::from_millis(1));
+    }
+}
+```
+
+
+### Message passing
+
+- Rust has channels for message passing between threads. 
+- `mpsc` stands for multiple producer, single consumer.
+- `send` is used to send a message and `recv` is used to receive a message.
+- The sending end of the channel must be cloned to be used in multiple threads, and moved into the closures.
+
+```rust
+use std::sync::mpsc;
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let (tx, rx) = mpsc::channel();
+
+    thread::spawn(move || {
+        let vals = vec![
+            String::from("hi"),
+            String::from("from"),
+            String::from("the"),
+            String::from("thread"),
+        ];
+
+        for val in vals {
+            tx.send(val).unwrap();
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    for received in rx {
+        println!("Got: {received}");
+    }
+}
+```
+
+- `recv` blocks the main thread until a message is received. Returns Result, so `unwrap` is used to panic on error.
+- `try_recv` can be used to check if a message is available without blocking.
+- Alternative used above is to use the reciever as an iterator.  This will end when the channel is closed (all senders dropped)
+
+
+### Shared state concurrency
+
+- Corresponding to Rc and RefCell, Rust has Arc and Mutex for shared state concurrency.
+- These implement the Send and Sync traits to ensure thread safety.
+- Arc is an atomic reference counted type, and Mutex is a mutual exclusion type.
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
+
+- `Arc::clone` is used to create a new reference to the counter.
+- `lock` is used to get a lock on the counter, and `unwrap` is used to panic on error.
+- Like a RefCell, we have interior mutability, but with the added thread safety of a Mutex.
+- Use these only for mulithreaded programs, as they have a performance cost.
+- Other issues still exist, like deadlocks when using Mutexes.   The book doesnt really go into  how to avoid these, but they are a common problem in concurrent programming.
+
+
+### Sync and Send
+
+- `Send` is a marker trait that indicates ownership can be transferred between threads.
+- `Sync` is a marker trait that indicates a type can be referenced from multiple threads... i..e a type T is Sync if &T is Send.  
+
+- `Mutex<T>` and  `Arc<T>`  are both Send and Sync.  `Rc<T>` is neither.
+- Note that in order to use a `Mutex<T>` in multiple threads (and access it), something like `Arc<T>` is necessary since the threads may outlive each other.
+
+This example fails:
+
+```
+use std::sync::Mutex;
+use std::thread;
+
+fn main() {
+    let counter = Mutex::new(0);
+
+    let handle = thread::spawn(  || {
+            let mut num = counter.lock().unwrap();
+            *num += 1;
+        });
+       
+    
+
+    handle.join().unwrap();
+    
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
