@@ -1211,3 +1211,10 @@ fn main() {
     println!("Result: {}", *counter.lock().unwrap());
 }
 ```
+
+## Chapters 17-20
+
+The book club did cover Chapter 17 and 18 (OOP and Pattern Matching), I just failed to make any notes about these chapters. ( I don't know why!) 
+
+The remaining chapters we skipped. 
+Some day (tm) I will revist this and add these chapters ! 
